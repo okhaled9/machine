@@ -63,19 +63,20 @@ def best_classifier(dataset):     #returns name of the column with  highest info
         yes = y_demo+y_rep      #total yes
         no = n_demo + n_rep     #total no
             
+        parent_entropy=0
         yes_entropy=0
         no_entropy=0
-        parent_entropy=0
         
-        if yes>0:
-            yes_entropy = (-y_rep/yes) * np.log2(y_rep/yes)    -(y_demo/yes) * np.log2(y_demo/yes)
         if rows>0:
             parent_entropy = -(rep/rows)*np.log2(rep/rows) -(dem/rows)*np.log2(dem/rows)
         
-        if no>0:
-            no_entropy  = (-n_rep/no ) * np.log2(n_rep/no )    -(n_demo/no ) * np.log2(n_demo/no )
+        if yes>0:
+            yes_entropy = (yes/rows)*((-y_rep/yes) * np.log2(y_rep/yes)    -(y_demo/yes) * np.log2(y_demo/yes))
         
-        igain = parent_entropy - (yes/rows)*yes_entropy - (no/rows)*no_entropy
+        if no>0:
+            no_entropy  = (no/rows)*((-n_rep/no ) * np.log2(n_rep/no )    -(n_demo/no ) * np.log2(n_demo/no ))
+        
+        igain = parent_entropy - yes_entropy - no_entropy
         if igain > maxgain:
             maxgain = igain
             maxind = i
