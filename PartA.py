@@ -33,7 +33,7 @@ def best_classifier(dataset):     #returns name of the column with  highest info
     party = dataset.iloc[:,0].tolist()
     
     maxgain=0
-    maxind=0
+    maxind=1
     
     rows = dataset.shape[0]
     cols = dataset.shape[1]
@@ -88,13 +88,23 @@ def best_classifier(dataset):     #returns name of the column with  highest info
     return dataset.columns[maxind]
 
 def build_tree(node,counter=1):
-    if check_purity(node.dataset) or (node.dataset.shape[1] <= 2):
+    # print(node.dataset)
+    
+    if check_purity(node.dataset) or (node.dataset.shape[1] <= 2) or counter>=20:
         return counter
     
+    for i in range(1,node.dataset.shape[1]):
+        label_column = dataset.iloc[:,i].tolist()
+        unique_classes = np.unique(label_column)
+        if len(unique_classes) == 1:
+            node.dataset.drop(node.dataset.columns[i], inplace=True, axis=1)
+            
+    
     split_col = best_classifier(node.dataset)
-    print(split_col,"\n\n")
     node.split_col = split_col
     left_data, right_data = split_by_column(node.dataset, split_col)
+    
+    # print('\n', left_data,"\n",right_data,"\n")
     
     left_node = node_(left_data,None,None,None)
     right_node = node_(right_data,None,None,None)
@@ -129,7 +139,12 @@ replace_absent(test)
 
 root = node_(train,None,None,None)
 
-print(build_tree(root,1))   #tree depth
+splitcol = best_classifier(train)
 
+print("splitcolumn:",splitcol,"\n\n")
 
+left, right = split_by_column(train, splitcol)
 
+print(left.head(),"\n\n",right.head())
+
+#print(build_tree(root,1))   #tree depth
